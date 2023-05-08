@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
@@ -16,7 +15,7 @@ class UserControllerTest {
 
 
     @BeforeEach
-    void BeforeEach() {
+    void beforeEach() {
         controller = new UserController();
     }
 
