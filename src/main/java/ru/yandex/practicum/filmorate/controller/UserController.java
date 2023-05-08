@@ -62,7 +62,7 @@ public class UserController {
     }
 
     private void validate(User user) {
-        if ( user.getEmail() == null || user.getEmail().isEmpty()) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new ValidationException("Email не может быть пустым");
         }
         if (!user.getEmail().contains("@")) {
@@ -74,7 +74,7 @@ public class UserController {
         if (user.getLogin().contains(" ")) {
             throw new ValidationException("Логин не может содержать пробелы");
         }
-        if ( user.getName() == null || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
