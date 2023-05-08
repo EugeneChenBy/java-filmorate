@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,7 +16,7 @@ class FilmControllerTest {
 
 
     @BeforeEach
-    void BeforeEach() {
+    void beforeEach() {
         controller = new FilmController();
     }
 
