@@ -6,8 +6,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class FilmController {
-    public final static LocalDate MINIMAL_DATE = LocalDate.of(1895, 12,25);
+    public static final LocalDate MINIMAL_DATE = LocalDate.of(1895, 12, 25);
     private int id = 0;
 
     Map<Integer, Film> films = new HashMap<>();
@@ -66,7 +64,7 @@ public class FilmController {
     }
 
     private void validate(Film film) {
-        if ( film.getName() == null || film.getName().isEmpty()) {
+        if (film.getName() == null || film.getName().isEmpty()) {
             throw new ValidationException("Наименование фильма не может быть пустым");
         }
         if (film.getDescription().length() > 200) {
