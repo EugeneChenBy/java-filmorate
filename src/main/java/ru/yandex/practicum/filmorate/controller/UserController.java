@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 public class UserController {
-    Map<Integer, User> users = new HashMap<>();
+    private Map<Integer, User> users = new HashMap<>();
     private int id = 0;
 
     @PostMapping("/users")
@@ -23,7 +23,7 @@ public class UserController {
 
         try {
             validate(user);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             log.error(e.getMessage());
             throw new ValidationException(e.getMessage());
         }
@@ -41,7 +41,7 @@ public class UserController {
 
         try {
             validate(user);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             log.error(e.getMessage());
             throw new ValidationException(e.getMessage());
         }
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     private void validate(User user) {
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new ValidationException("Email не может быть пустым");
         }
         if (!user.getEmail().contains("@")) {
@@ -77,7 +77,7 @@ public class UserController {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
     }

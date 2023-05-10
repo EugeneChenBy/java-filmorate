@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 public class FilmController {
     public static final LocalDate MINIMAL_DATE = LocalDate.of(1895, 12, 25);
     private int id = 0;
-
-    Map<Integer, Film> films = new HashMap<>();
+    private Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
     public Film create(@RequestBody Film film) {
@@ -25,7 +24,7 @@ public class FilmController {
 
         try {
             validate(film);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             log.error(e.getMessage());
             throw new ValidationException(e.getMessage());
         }
@@ -43,7 +42,7 @@ public class FilmController {
 
         try {
             validate(film);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             log.error(e.getMessage());
             throw new ValidationException(e.getMessage());
         }
@@ -64,16 +63,16 @@ public class FilmController {
     }
 
     private void validate(Film film) {
-        if (film.getName() == null || film.getName().isEmpty()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Наименование фильма не может быть пустым");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             throw new ValidationException("Максимальная длина описания 200 символов");
         }
-        if (film.getReleaseDate().isBefore(MINIMAL_DATE)) {
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(MINIMAL_DATE)) {
             throw new ValidationException("Дата выпуска фильма не может быть ранее " + MINIMAL_DATE);
         }
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() != null && film.getDuration().isNegative()) {
             throw new ValidationException("Продолжительность фильма не может быть отрицательной");
         }
     }
