@@ -15,5 +15,5 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Duration duration;
-    private Set<Long> likes;
+    private Set<Integer> likes;
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
@@ -63,6 +64,26 @@ public class FilmController {
         films.put(film.getId(), film);
 
         return film;
+    }
+
+    @GetMapping("/films/{id}")
+    public Film findById(@PathVariable("id") int filmId) {
+        return filmService.getFilmById(filmId);
+    }
+
+    @PutMapping("/films/{id}/like/{userId}")
+    public void likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        filmService.likeFilm(filmId, userId);
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void removeLikeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        filmService.removeLike(filmId, userId);
+    }
+
+    @GetMapping("/films/popular?count={count}")
+    public List<Film> getBestFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
+        return getBestFilms(count);
     }
 
     @GetMapping("/films")

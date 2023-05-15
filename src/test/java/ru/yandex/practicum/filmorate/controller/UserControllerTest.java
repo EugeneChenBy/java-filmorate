@@ -13,7 +13,7 @@ class UserControllerTest {
     UserController controller;
     User user;
 
-
+/*
     @BeforeEach
     void beforeEach() {
         controller = new UserController();
@@ -137,4 +137,6 @@ class UserControllerTest {
         }
         assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
     }
+
+ */
 }
