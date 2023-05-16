@@ -3,6 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -13,11 +18,14 @@ class FilmControllerTest {
 
     FilmController controller;
     Film film;
-/*
+
+    private void newFilmController() {
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage(), new UserService(new InMemoryUserStorage())));
+    }
 
     @BeforeEach
     void beforeEach() {
-        controller = new FilmController();
+        newFilmController();
     }
 
     void createNewValidFilm() {
@@ -31,8 +39,6 @@ class FilmControllerTest {
 
     @Test
     void shouldCreateFilm() {
-        controller = new FilmController();
-
         createNewValidFilm();
 
         controller.create(film);
@@ -52,19 +58,19 @@ class FilmControllerTest {
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректной датой релиза не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setReleaseDate(isMinimal);
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректной датой релиза не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setReleaseDate(beforeMinimal);
         try {
             controller.create(film);
         } catch (Exception e) {
-            assertEquals("Дата выпуска фильма не может быть ранее " + FilmController.MINIMAL_DATE, e.getMessage(), "Ошибка создания фильма со слишком ранней датой релиза не отловлена");
+            assertEquals("Дата выпуска фильма не может быть ранее " + FilmService.MINIMAL_DATE, e.getMessage(), "Ошибка создания фильма со слишком ранней датой релиза не отловлена");
         }
         assertEquals(0, controller.getFilms().size(), "Фильм с некорректной датой релиза по какой-то причине добавлен");
     }
@@ -80,13 +86,13 @@ class FilmControllerTest {
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректной продолжительностью не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setDuration(durZero);
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректной продолжительностью не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setDuration(durNegative);
         try {
@@ -142,13 +148,13 @@ class FilmControllerTest {
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректным описанием не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setDescription(length200);
         controller.create(film);
         assertEquals(1, controller.getFilms().size(), "Фильм с корректным описанием не добавлен");
 
-        controller = new FilmController();
+        newFilmController();
         createNewValidFilm();
         film.setDescription(length201);
         try {
@@ -158,6 +164,4 @@ class FilmControllerTest {
         }
         assertEquals(0, controller.getFilms().size(), "Фильм с некорректным описанием по какой-то причине добавлен");
     }
-
- */
 }

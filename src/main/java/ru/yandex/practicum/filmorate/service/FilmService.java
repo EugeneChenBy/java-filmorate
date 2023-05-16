@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class FilmService {
     public static final LocalDate MINIMAL_DATE = LocalDate.of(1895, 12, 25);
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserService userService) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+        this.userService = userService;
     }
 
     public Film create( Film film) {
@@ -49,11 +49,8 @@ public class FilmService {
             throw new ValidationException(e.getMessage());
         }
 
-        if (filmStorage.getFilmById(film.getId()) == null) {
-            String text = "Не найден фильм с id = " + film.getId();
-            log.error(text);
-            throw new FilmNotFoundException(text);
-        }
+        throwIfFilmNull(filmStorage.getFilmById(film.getId()), film.getId());
+
         if (film.getLikes() == null) {
             film.setLikes(new HashSet<>());
         }
@@ -67,22 +64,23 @@ public class FilmService {
 
     public Film getFilmById(int id) {
         Film film = filmStorage.getFilmById(id);
-        if (film == null) {
-            String text = "Не найден фильм с id = " + id;
-            log.error(text);
-            throw new FilmNotFoundException(text);
-        }
+
+        throwIfFilmNull(film, id);
+
         return film;
     }
 
     public void likeFilm(int filmId, int userId) {
         Film film = getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
+
+        throwIfFilmNull(film, filmId);
+
+        User user = userService.getUserById(userId);
 
         likeFilm(film, user);
     }
 
-    public void likeFilm(Film film, User user) {
+    private void likeFilm(Film film, User user) {
         Set<Integer> likes = film.getLikes();
         likes.add(user.getId());
         film.setLikes(likes);
@@ -92,12 +90,15 @@ public class FilmService {
 
     public void removeLike(int filmId, int userId) {
         Film film = getFilmById(filmId);
-        User user = userStorage.getUserById(userId);
+
+        throwIfFilmNull(film, filmId);
+
+        User user = userService.getUserById(userId);
 
         removeLike(film, user);
     }
 
-    public void removeLike(Film film, User user) {
+    private void removeLike(Film film, User user) {
         Set<Integer> likes = film.getLikes();
         likes.remove(user.getId());
         film.setLikes(likes);
@@ -114,6 +115,14 @@ public class FilmService {
 
     private int compare(Film f0, Film f1) {
         return f1.getLikes().size() - f0.getLikes().size();
+    }
+
+    private void throwIfFilmNull(Film film, int filmId) {
+        if (film == null) {
+            String text = "Не найден фильм с id = " + filmId;
+            log.error(text);
+            throw new FilmNotFoundException(text);
+        }
     }
 
     private void validate(Film film) {

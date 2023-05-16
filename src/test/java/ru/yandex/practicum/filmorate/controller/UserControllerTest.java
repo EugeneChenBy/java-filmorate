@@ -3,6 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -13,10 +17,13 @@ class UserControllerTest {
     UserController controller;
     User user;
 
-/*
+    private void newUserController() {
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
+    }
+
     @BeforeEach
     void beforeEach() {
-        controller = new UserController();
+        newUserController();
     }
 
     void createNewValidUser() {
@@ -30,8 +37,6 @@ class UserControllerTest {
 
     @Test
     void shouldCreateUser() {
-        controller = new UserController();
-
         createNewValidUser();
 
         controller.create(user);
@@ -50,13 +55,13 @@ class UserControllerTest {
             assertEquals("Дата рождения не может быть в будущем", e.getMessage(), "Ошибка создания пользователя с датой рождения в будущем не отловлена");
         }
 
-        controller = new UserController();
+        newUserController();
         createNewValidUser();
         user.setBirthday(LocalDate.now());
         controller.create(user);
         assertEquals(1, controller.getUsers().size(), "Пользователь с корректной датой рождения по какой-то причине добавился");
 
-        controller = new UserController();
+        newUserController();
         createNewValidUser();
         user.setBirthday(LocalDate.now().minusDays(1));
         controller.create(user);
@@ -137,6 +142,4 @@ class UserControllerTest {
         }
         assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
     }
-
- */
 }
