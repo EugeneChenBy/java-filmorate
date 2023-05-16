@@ -43,9 +43,9 @@ class FilmControllerTest {
 
     @Test
     void shouldNotCreateFilmBeforeMinimalDate() {
-        LocalDate afterMinimal = FilmController.MINIMAL_DATE.plusDays(1);
-        LocalDate isMinimal = FilmController.MINIMAL_DATE;
-        LocalDate beforeMinimal = FilmController.MINIMAL_DATE.minusDays(1);
+        LocalDate afterMinimal = FilmService.MINIMAL_DATE.plusDays(1);
+        LocalDate isMinimal = FilmService.MINIMAL_DATE;
+        LocalDate beforeMinimal = FilmService.MINIMAL_DATE.minusDays(1);
 
         createNewValidFilm();
         film.setReleaseDate(afterMinimal);
