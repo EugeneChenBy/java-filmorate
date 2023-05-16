@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -29,7 +28,7 @@ public class FilmService {
         this.userService = userService;
     }
 
-    public Film create( Film film) {
+    public Film create(Film film) {
         try {
             validate(film);
         } catch (ValidationException e) {
@@ -41,7 +40,7 @@ public class FilmService {
         return filmStorage.create(film);
     }
 
-    public Film update( Film film) {
+    public Film update(Film film) {
         try {
             validate(film);
         } catch (ValidationException e) {
