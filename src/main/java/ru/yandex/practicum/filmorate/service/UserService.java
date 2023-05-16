@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -46,11 +47,7 @@ public class UserService {
             throw new ValidationException(e.getMessage());
         }
 
-        if (userStorage.getUserById(user.getId()) == null) {
-            String text = "Не найден пользователь с id = " + user.getId();
-            log.error(text);
-            throw new UserNotFoundException(text);
-        }
+        throwIfUserNull(userStorage.getUserById(user.getId()), user.getId());
 
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
@@ -71,10 +68,13 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
 
+        throwIfUserNull(user, userId);
+        throwIfUserNull(friend, friendId);
+
         addFriend(user, friend);
     }
 
-    public void addFriend(User user1, User user2) {
+    private void addFriend(User user1, User user2) {
         Set<Integer> friends1 = user1.getFriends();
         friends1.add(user2.getId());
         user1.setFriends(friends1);
@@ -91,10 +91,13 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
 
+        throwIfUserNull(user, userId);
+        throwIfUserNull(friend, friendId);
+
         removeFriend(user, friend);
     }
 
-    public void removeFriend(User user1, User user2) {
+    private void removeFriend(User user1, User user2) {
         Set<Integer> friends1 = user1.getFriends();
         friends1.remove(user2.getId());
         user1.setFriends(friends1);
@@ -110,6 +113,8 @@ public class UserService {
     public List<User> getFriends(int userId) {
         User user = userStorage.getUserById(userId);
 
+        throwIfUserNull(user, userId);
+
         return getFriends(user);
     }
 
@@ -121,14 +126,15 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User otherUser = userStorage.getUserById(otherUserId);
 
+        throwIfUserNull(user, userId);
+        throwIfUserNull(otherUser, otherUserId);
+
         return getCommonFriends(user, otherUser);
     }
 
-    public List<User> getCommonFriends(User user1, User user2) {
+    private List<User> getCommonFriends(User user1, User user2) {
         List<Integer> listFriends1 = user1.getFriends().stream().collect(Collectors.toList());
         List<Integer> listFriends2 = user2.getFriends().stream().collect(Collectors.toList());
-
-        log.info(listFriends1 + " " + listFriends2);
 
         List<Integer> listCommonIdFriends = listFriends1.stream().filter(listFriends2::contains).collect(Collectors.toList());
 
@@ -137,6 +143,14 @@ public class UserService {
 
     private List<User> getUserListFromIdList(List<Integer> listInt) {
         return listInt.stream().map(p -> userStorage.getUserById(p)).collect(Collectors.toList());
+    }
+
+    private void throwIfUserNull(User user, int userId) {
+        if (user == null) {
+            String text = "Не найден пользователь с id = " + userId;
+            log.error(text);
+            throw new UserNotFoundException(text);
+        }
     }
 
     private void validate(User user) {
