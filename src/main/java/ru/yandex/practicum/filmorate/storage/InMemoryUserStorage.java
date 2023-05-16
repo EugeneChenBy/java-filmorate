@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private Map<Integer, User> users = new HashMap<>();
     private int id = 0;
 
