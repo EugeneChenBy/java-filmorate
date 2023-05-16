@@ -3,12 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +33,8 @@ public class UserService {
             throw new ValidationException(e.getMessage());
         }
 
+        user.setFriends(new HashSet<>());
+
         return userStorage.create(user);
     }
 
@@ -45,8 +49,13 @@ public class UserService {
         if (userStorage.getUserById(user.getId()) == null) {
             String text = "Не найден пользователь с id = " + user.getId();
             log.error(text);
-            throw new ValidationException(text);
+            throw new UserNotFoundException(text);
         }
+
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
+
         return userStorage.update(user);
     }
 
@@ -118,6 +127,8 @@ public class UserService {
     public List<User> getCommonFriends(User user1, User user2) {
         List<Integer> listFriends1 = user1.getFriends().stream().collect(Collectors.toList());
         List<Integer> listFriends2 = user2.getFriends().stream().collect(Collectors.toList());
+
+        log.info(listFriends1 + " " + listFriends2);
 
         List<Integer> listCommonIdFriends = listFriends1.stream().filter(listFriends2::contains).collect(Collectors.toList());
 

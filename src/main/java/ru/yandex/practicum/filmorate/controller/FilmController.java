@@ -40,26 +40,36 @@ public class FilmController {
 
     @GetMapping("/films/{id}")
     public Film findById(@PathVariable("id") int filmId) {
+        log.info("Получен GET-запрос на получение фильма - {}", filmId);
+
         return filmService.getFilmById(filmId);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
     public void likeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        log.info("Получен PUT-запрос на установку лайка фильму - {} от пользователя - {}", filmId, userId);
+
         filmService.likeFilm(filmId, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
     public void removeLikeFilm(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+        log.info("Получен DELETE-запрос на снятие лайка с фильма - {} от пользователя - {}", filmId, userId);
+
         filmService.removeLike(filmId, userId);
     }
 
-    @GetMapping("/films/popular?count={count}")
-    public List<Film> getBestFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
-        return getBestFilms(count);
+    @GetMapping("/films/popular")
+    public List<Film> getBestFilms(@RequestParam(name = "count", defaultValue = "10", required = false) int count) {
+        log.info("Получен GET-запрос списка {} популярных фильмов", count);
+
+        return filmService.getBestFilms(count);
     }
 
     @GetMapping("/films")
     public List<Film> getFilms() {
+        log.info("Получен GET-запрос списка всех фильмов");
+
         return filmService.getAllFilms();
     }
 }

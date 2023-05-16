@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +36,7 @@ public class FilmService {
             log.error(e.getMessage());
             throw new ValidationException(e.getMessage());
         }
+        film.setLikes(new HashSet<>());
 
         return filmStorage.create(film);
     }
@@ -52,8 +52,12 @@ public class FilmService {
         if (filmStorage.getFilmById(film.getId()) == null) {
             String text = "Не найден фильм с id = " + film.getId();
             log.error(text);
-            throw new ValidationException(text);
+            throw new FilmNotFoundException(text);
         }
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
+        }
+
         return filmStorage.update(film);
     }
 
@@ -62,7 +66,13 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        return filmStorage.getFilmById(id);
+        Film film = filmStorage.getFilmById(id);
+        if (film == null) {
+            String text = "Не найден фильм с id = " + id;
+            log.error(text);
+            throw new FilmNotFoundException(text);
+        }
+        return film;
     }
 
     public void likeFilm(int filmId, int userId) {
@@ -103,7 +113,7 @@ public class FilmService {
     }
 
     private int compare(Film f0, Film f1) {
-        return f0.getLikes().size() - f1.getLikes().size();
+        return f1.getLikes().size() - f0.getLikes().size();
     }
 
     private void validate(Film film) {
