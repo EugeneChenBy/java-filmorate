@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class FilmService {
     public static final LocalDate MINIMAL_DATE = LocalDate.of(1895, 12, 25);
     private final FilmStorage filmStorage;
@@ -29,24 +28,15 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        try {
-            validate(film);
-        } catch (ValidationException e) {
-            log.error(e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
+        validate(film);
+
         film.setLikes(new HashSet<>());
 
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
-        try {
-            validate(film);
-        } catch (ValidationException e) {
-            log.error(e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
+        validate(film);
 
         throwIfFilmNull(filmStorage.getFilmById(film.getId()), film.getId());
 
@@ -119,7 +109,6 @@ public class FilmService {
     private void throwIfFilmNull(Film film, int filmId) {
         if (film == null) {
             String text = "Не найден фильм с id = " + filmId;
-            log.error(text);
             throw new FilmNotFoundException(text);
         }
     }

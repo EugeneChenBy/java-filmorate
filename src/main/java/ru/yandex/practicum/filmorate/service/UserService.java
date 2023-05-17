@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class UserService {
     private final UserStorage userStorage;
 
@@ -25,12 +24,7 @@ public class UserService {
     }
 
     public User create(User user) {
-        try {
-            validate(user);
-        } catch (ValidationException e) {
-            log.error(e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
+        validate(user);
 
         user.setFriends(new HashSet<>());
 
@@ -38,12 +32,7 @@ public class UserService {
     }
 
     public User update(User user) {
-        try {
-            validate(user);
-        } catch (ValidationException e) {
-            log.error(e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
+        validate(user);
 
         throwIfUserNull(userStorage.getUserById(user.getId()), user.getId());
 
@@ -150,7 +139,6 @@ public class UserService {
     private void throwIfUserNull(User user, int userId) {
         if (user == null) {
             String text = "Не найден пользователь с id = " + userId;
-            log.error(text);
             throw new UserNotFoundException(text);
         }
     }
