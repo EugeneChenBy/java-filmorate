@@ -96,14 +96,7 @@ public class FilmService {
     }
 
     public List<Film> getBestFilms(int size) {
-        return filmStorage.getFilmsList().stream()
-                .sorted((f0, f1) -> compare(f0, f1))
-                .limit(size)
-                .collect(Collectors.toList());
-    }
-
-    private int compare(Film f0, Film f1) {
-        return f1.getLikes().size() - f0.getLikes().size();
+        return filmStorage.getBestFilms(size);
     }
 
     private void throwIfFilmNull(Film film, int filmId) {

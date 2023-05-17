@@ -14,4 +14,6 @@ public interface FilmStorage {
     public void delete(Film film);
 
     public Film getFilmById(int id);
+
+    public List<Film> getBestFilms(int size);
 }
