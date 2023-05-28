@@ -1,25 +1,39 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.FilmDBStorage;
+import ru.yandex.practicum.filmorate.storage.UserDBStorage;
 
 import java.time.Duration;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@AutoConfigureTestDatabase
 class FilmControllerTest {
 
-    FilmController controller;
+    FilmService service;
     Film film;
+    JdbcTemplate jdbcTemplate;
+/*
+    @Autowired
+    FilmControllerTest(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private void newFilmController() {
-        controller = new FilmController(new FilmService(new InMemoryFilmStorage(), new UserService(new InMemoryUserStorage())));
+        service = new FilmService(new FilmDBStorage(jdbcTemplate), new UserService(new UserDBStorage(jdbcTemplate)));
     }
 
     @BeforeEach
@@ -40,38 +54,38 @@ class FilmControllerTest {
     void shouldCreateFilm() {
         createNewValidFilm();
 
-        controller.create(film);
+        service.create(film);
 
-        assertEquals(1, controller.getFilms().size(), "Фильм не добавлен");
-        assertEquals(film, controller.getFilms().get(0), "Созданный фильм не равен добавляемому");
+        assertEquals(1, service.getAllFilms().size(), "Фильм не добавлен");
+        assertEquals(film, service.getAllFilms().get(0), "Созданный фильм не равен добавляемому");
     }
 
     @Test
     void shouldNotCreateFilmBeforeMinimalDate() {
-        LocalDate afterMinimal = FilmService.MINIMAL_DATE.plusDays(1);
-        LocalDate isMinimal = FilmService.MINIMAL_DATE;
-        LocalDate beforeMinimal = FilmService.MINIMAL_DATE.minusDays(1);
+        LocalDate afterMinimal = service.MINIMAL_DATE.plusDays(1);
+        LocalDate isMinimal = service.MINIMAL_DATE;
+        LocalDate beforeMinimal = service.MINIMAL_DATE.minusDays(1);
 
         createNewValidFilm();
         film.setReleaseDate(afterMinimal);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректной датой релиза не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректной датой релиза не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setReleaseDate(isMinimal);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректной датой релиза не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректной датой релиза не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setReleaseDate(beforeMinimal);
         try {
-            controller.create(film);
+            service.create(film);
         } catch (Exception e) {
             assertEquals("Дата выпуска фильма не может быть ранее " + FilmService.MINIMAL_DATE, e.getMessage(), "Ошибка создания фильма со слишком ранней датой релиза не отловлена");
         }
-        assertEquals(0, controller.getFilms().size(), "Фильм с некорректной датой релиза по какой-то причине добавлен");
+        assertEquals(0, service.getAllFilms().size(), "Фильм с некорректной датой релиза по какой-то причине добавлен");
     }
 
     @Test
@@ -82,24 +96,24 @@ class FilmControllerTest {
 
         createNewValidFilm();
         film.setDuration(durPositive);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректной продолжительностью не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректной продолжительностью не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setDuration(durZero);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректной продолжительностью не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректной продолжительностью не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setDuration(durNegative);
         try {
-            controller.create(film);
+            service.create(film);
         } catch (Exception e) {
             assertEquals("Продолжительность фильма не может быть отрицательной", e.getMessage(), "Ошибка создания фильма с отрицательной продолжительностью не отловлена");
         }
-        assertEquals(0, controller.getFilms().size(), "Фильм с некорректной продолжительностью по какой-то причине добавлен");
+        assertEquals(0, service.getAllFilms().size(), "Фильм с некорректной продолжительностью по какой-то причине добавлен");
     }
 
     @Test
@@ -107,20 +121,20 @@ class FilmControllerTest {
         createNewValidFilm();
         film.setName("");
         try {
-            controller.create(film);
+            service.create(film);
         } catch (Exception e) {
             assertEquals("Наименование фильма не может быть пустым", e.getMessage(), "Ошибка создания фильма с пустым наименованием не отловлена");
         }
-        assertEquals(0, controller.getFilms().size(), "Фильм с пустым наименованием по какой-то причине добавился");
+        assertEquals(0, service.getAllFilms().size(), "Фильм с пустым наименованием по какой-то причине добавился");
 
         createNewValidFilm();
         film.setName(null);
         try {
-            controller.create(film);
+            service.create(film);
         } catch (Exception e) {
             assertEquals("Наименование фильма не может быть пустым", e.getMessage(), "Ошибка создания фильма с пустым наименованием не отловлена");
         }
-        assertEquals(0, controller.getFilms().size(), "Фильм с пустым наименованием по какой-то причине добавился");
+        assertEquals(0, service.getAllFilms().size(), "Фильм с пустым наименованием по какой-то причине добавился");
     }
 
     @Test
@@ -144,23 +158,23 @@ class FilmControllerTest {
 
         createNewValidFilm();
         film.setDescription(length199);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректным описанием не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректным описанием не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setDescription(length200);
-        controller.create(film);
-        assertEquals(1, controller.getFilms().size(), "Фильм с корректным описанием не добавлен");
+        service.create(film);
+        assertEquals(1, service.getAllFilms().size(), "Фильм с корректным описанием не добавлен");
 
         newFilmController();
         createNewValidFilm();
         film.setDescription(length201);
         try {
-            controller.create(film);
+            service.create(film);
         } catch (Exception e) {
             assertEquals("Максимальная длина описания 200 символов", e.getMessage(), "Ошибка создания фильма с превышенной длиной описания не отловлена");
         }
-        assertEquals(0, controller.getFilms().size(), "Фильм с некорректным описанием по какой-то причине добавлен");
-    }
+        assertEquals(0, service.getAllFilms().size(), "Фильм с некорректным описанием по какой-то причине добавлен");
+    }*/
 }

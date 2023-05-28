@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -9,9 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class FilmService {
@@ -25,10 +24,19 @@ public class FilmService {
         this.userService = userService;
     }
 
+    public Film getFilmElseThrow(int id) {
+        try {
+            return filmStorage.getFilmById(id);
+        } catch (EmptyResultDataAccessException e) {
+            String text = "Не найден фильм с id = " + id;
+            throw new FilmNotFoundException(text);
+        }
+    }
+
     public Film create(Film film) {
         validate(film);
 
-        film.setLikes(new HashSet<>());
+        film.setLikes(0);
 
         return filmStorage.create(film);
     }
@@ -36,11 +44,7 @@ public class FilmService {
     public Film update(Film film) {
         validate(film);
 
-        throwIfFilmNull(filmStorage.getFilmById(film.getId()), film.getId());
-
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
-        }
+        Film filmTmp = getFilmElseThrow(film.getId());
 
         return filmStorage.update(film);
     }
@@ -50,58 +54,35 @@ public class FilmService {
     }
 
     public Film getFilmById(int id) {
-        Film film = filmStorage.getFilmById(id);
-
-        throwIfFilmNull(film, id);
-
-        return film;
+       // return new Film(1, "name", "description", LocalDate.of(1988, 11, 14),
+       //         Duration.ofMinutes(100), new MPADto(1));
+        return getFilmElseThrow(id);
     }
 
     public void likeFilm(int filmId, int userId) {
-        Film film = getFilmById(filmId);
-
-        throwIfFilmNull(film, filmId);
-
-        User user = userService.getUserById(userId);
+        Film film = getFilmElseThrow(filmId);
+        User user = userService.getUserElseThrow(userId);
 
         likeFilm(film, user);
     }
 
     private void likeFilm(Film film, User user) {
-        Set<Integer> likes = film.getLikes();
-        likes.add(user.getId());
-        film.setLikes(likes);
-
-        filmStorage.update(film);
+        filmStorage.addLike(film.getId(), user.getId());
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = getFilmById(filmId);
-
-        throwIfFilmNull(film, filmId);
-
-        User user = userService.getUserById(userId);
+        Film film = getFilmElseThrow(filmId);
+        User user = userService.getUserElseThrow(userId);
 
         removeLike(film, user);
     }
 
     private void removeLike(Film film, User user) {
-        Set<Integer> likes = film.getLikes();
-        likes.remove(user.getId());
-        film.setLikes(likes);
-
-        filmStorage.update(film);
+        filmStorage.removeLike(film.getId(),user.getId());
     }
 
     public List<Film> getBestFilms(int size) {
         return filmStorage.getBestFilms(size);
-    }
-
-    private void throwIfFilmNull(Film film, int filmId) {
-        if (film == null) {
-            String text = "Не найден фильм с id = " + filmId;
-            throw new FilmNotFoundException(text);
-        }
     }
 
     private void validate(Film film) {

@@ -16,4 +16,8 @@ public interface FilmStorage {
     public Film getFilmById(int id);
 
     public List<Film> getBestFilms(int size);
+
+    public void addLike(int film_id, int user_id);
+
+    public void removeLike(int film_id, int user_id);
 }

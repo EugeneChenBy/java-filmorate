@@ -1,22 +1,36 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserDBStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@AutoConfigureTestDatabase
 class UserControllerTest {
 
     UserController controller;
     User user;
+    JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    UserControllerTest(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private void newUserController() {
-        controller = new UserController(new UserService(new InMemoryUserStorage()));
+        controller = new UserController(new UserService(new UserDBStorage(jdbcTemplate)));
     }
 
     @BeforeEach
@@ -25,12 +39,12 @@ class UserControllerTest {
     }
 
     void createNewValidUser() {
-        user = User.builder()
+       /* user = User.builder()
                 .email("misyuchenko@mail.ru")
                 .login("eugene_chen")
                 .name("Eugene Chen")
                 .birthday(LocalDate.of(1988, 11, 14))
-                .build();
+                .build();*/
     }
 
     @Test

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -8,10 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -22,10 +20,17 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public User getUserElseThrow(int id) {
+        try {
+            return userStorage.getUserById(id);
+        } catch (EmptyResultDataAccessException e) {
+            String text = "Не найден пользователь с id = " + id;
+            throw new UserNotFoundException(text);
+        }
+    }
+
     public User create(User user) {
         validate(user);
-
-        user.setFriends(new HashSet<>());
 
         return userStorage.create(user);
     }
@@ -33,11 +38,7 @@ public class UserService {
     public User update(User user) {
         validate(user);
 
-        throwIfUserNull(userStorage.getUserById(user.getId()), user.getId());
-
-        if (user.getFriends() == null) {
-            user.setFriends(new HashSet<>());
-        }
+        User userTmp = getUserElseThrow(user.getId());
 
         return userStorage.update(user);
     }
@@ -47,99 +48,50 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        User user = userStorage.getUserById(id);
-
-        throwIfUserNull(user, id);
-
-        return user;
+        return getUserElseThrow(id);
     }
 
     public void addFriend(int userId, int friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-
-        throwIfUserNull(user, userId);
-        throwIfUserNull(friend, friendId);
+        User user = getUserElseThrow(userId);
+        User friend = getUserElseThrow(friendId);
 
         addFriend(user, friend);
     }
 
     private void addFriend(User user1, User user2) {
-        Set<Integer> friends1 = user1.getFriends();
-        friends1.add(user2.getId());
-        user1.setFriends(friends1);
-
-        Set<Integer> friends2 = user2.getFriends();
-        friends2.add(user1.getId());
-        user2.setFriends(friends2);
-
-        userStorage.update(user1);
-        userStorage.update(user2);
+        userStorage.addFriend(user1.getId(), user2.getId());
     }
 
     public void removeFriend(int userId, int friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-
-        throwIfUserNull(user, userId);
-        throwIfUserNull(friend, friendId);
+        User user = getUserElseThrow(userId);
+        User friend = getUserElseThrow(friendId);
 
         removeFriend(user, friend);
     }
 
     private void removeFriend(User user1, User user2) {
-        Set<Integer> friends1 = user1.getFriends();
-        friends1.remove(user2.getId());
-        user1.setFriends(friends1);
-
-        Set<Integer> friends2 = user2.getFriends();
-        friends2.remove(user1.getId());
-        user2.setFriends(friends2);
-
-        userStorage.update(user1);
-        userStorage.update(user2);
+        userStorage.removeFriend(user1.getId(), user2.getId());
     }
 
     public List<User> getFriends(int userId) {
-        User user = userStorage.getUserById(userId);
-
-        throwIfUserNull(user, userId);
+        User user = getUserElseThrow(userId);
 
         return getFriends(user);
     }
 
     public List<User> getFriends(User user) {
-        return getUserListFromIdList(user.getFriends().stream().collect(Collectors.toList()));
+        return userStorage.getFriends(user.getId());
     }
 
     public List<User> getCommonFriends(int userId, int otherUserId) {
-        User user = userStorage.getUserById(userId);
-        User otherUser = userStorage.getUserById(otherUserId);
-
-        throwIfUserNull(user, userId);
-        throwIfUserNull(otherUser, otherUserId);
+        User user = getUserElseThrow(userId);
+        User otherUser = getUserElseThrow(otherUserId);
 
         return getCommonFriends(user, otherUser);
     }
 
     private List<User> getCommonFriends(User user1, User user2) {
-        List<Integer> listFriends1 = user1.getFriends().stream().collect(Collectors.toList());
-        List<Integer> listFriends2 = user2.getFriends().stream().collect(Collectors.toList());
-
-        List<Integer> listCommonIdFriends = listFriends1.stream().filter(listFriends2::contains).collect(Collectors.toList());
-
-        return getUserListFromIdList(listCommonIdFriends);
-    }
-
-    private List<User> getUserListFromIdList(List<Integer> listInt) {
-        return listInt.stream().map(p -> userStorage.getUserById(p)).collect(Collectors.toList());
-    }
-
-    private void throwIfUserNull(User user, int userId) {
-        if (user == null) {
-            String text = "Не найден пользователь с id = " + userId;
-            throw new UserNotFoundException(text);
-        }
+        return userStorage.getCommonFriends(user1.getId(), user2.getId());
     }
 
     private void validate(User user) {
