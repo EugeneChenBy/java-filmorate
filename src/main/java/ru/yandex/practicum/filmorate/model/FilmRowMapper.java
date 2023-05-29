@@ -1,11 +1,11 @@
-package ru.yandex.practicum.filmorate.model.rowmapper;
+package ru.yandex.practicum.filmorate.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.ArrayList;
+
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.MPA;
 
 public class FilmRowMapper implements RowMapper<Film> {
     @Override
@@ -15,7 +15,9 @@ public class FilmRowMapper implements RowMapper<Film> {
                 rs.getString("description"),
                 rs.getDate("creation_date").toLocalDate(),
                 Duration.ofMinutes(rs.getLong("duration")),
-                new MPA(rs.getInt("mpa"))
+                new MPA(rs.getInt("mpa_id"), rs.getString("mpa_name")),
+                rs.getInt("likes"),
+                new ArrayList<>()
         );
     }
 }

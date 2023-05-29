@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MPA {
     private int id;
     @Nullable

@@ -3,16 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-//@Builder
-/*@ToString
-@EqualsAndHashCode
-@Getter
-@Setter*/
 public class User {
     private int id;
     private String email;

@@ -2,12 +2,10 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.MPANotFoundException;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.model.rowmapper.MPARowMapper;
+import ru.yandex.practicum.filmorate.model.MPARowMapper;
 
 import java.util.List;
 
