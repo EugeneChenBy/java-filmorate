@@ -20,7 +20,7 @@ public interface UserStorage {
 
     public List<User> getCommonFriends(int userId, int otherUserId);
 
-    public void addFriend(int user1_id, int user2_id);
+    public void addFriend(int user1Id, int user2Id);
 
-    public void removeFriend(int user1_id, int user2_id);
+    public void removeFriend(int user1Id, int user2Id);
 }
