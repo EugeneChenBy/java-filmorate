@@ -43,8 +43,8 @@ public class FilmDBStorage implements FilmStorage {
 
         Map<Integer, Film> mapFilms = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
 
-        genresFilms.forEach(t -> mapFilms.get(Integer.parseInt(t.get("film_id").toString())).
-                getGenres().add(new Genre(Integer.parseInt(t.get("genre_id").toString()),
+        genresFilms.forEach(t -> mapFilms.get(Integer.parseInt(t.get("film_id").toString()))
+                        .getGenres().add(new Genre(Integer.parseInt(t.get("genre_id").toString()),
                                           t.get("name").toString())
                                           )
                                 );
@@ -149,17 +149,17 @@ public class FilmDBStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(int film_id, int user_id) {
+    public void addLike(int filmId, int userId) {
         String sql = "INSERT INTO film_like (film_id, user_id, last_update) \n" +
                       "VALUES (?, ?, CURRENT_TIMESTAMP())";
 
-        jdbcTemplate.update(sql, film_id, user_id);
+        jdbcTemplate.update(sql, filmId, userId);
     }
 
     @Override
-    public void removeLike(int film_id, int user_id) {
+    public void removeLike(int filmId, int userId) {
         String sqlQuery = "DELETE FROM film_like WHERE film_id = ? AND user_id = ?";
 
-        jdbcTemplate.update(sqlQuery, film_id, user_id);
+        jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 }

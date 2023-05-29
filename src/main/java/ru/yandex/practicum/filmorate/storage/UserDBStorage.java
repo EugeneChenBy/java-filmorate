@@ -102,17 +102,17 @@ public class UserDBStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(int user1_id, int user2_id) {
+    public void addFriend(int user1Id, int user2Id) {
         String sql = "INSERT INTO friend (user1_id, user2_id, status, last_update) \n" +
                      "VALUES (?, ?, 0, CURRENT_TIMESTAMP())";
 
-        jdbcTemplate.update(sql, user1_id, user2_id);
+        jdbcTemplate.update(sql, user1Id, user2Id);
     }
 
     @Override
-    public void removeFriend(int user1_id, int user2_id) {
+    public void removeFriend(int user1Id, int user2Id) {
         String sqlQuery = "DELETE FROM friend WHERE user1_id IN (?, ?) AND user2_id IN (?, ?) ";
 
-        jdbcTemplate.update(sqlQuery, user1_id, user2_id, user1_id, user2_id);
+        jdbcTemplate.update(sqlQuery, user1Id, user2Id, user1Id, user2Id);
     }
 }
