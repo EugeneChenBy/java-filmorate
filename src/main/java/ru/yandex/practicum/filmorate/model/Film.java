@@ -40,20 +40,19 @@ public class Film {
     private void unpackMPA(Map<String,String> mpa) {
         int mpaId = Integer.parseInt(mpa.get("id"));
         String mpaName = mpa.get("name");
+
         this.mpa = new MPA(mpaId, mpaName);
-        log.debug(mpaId + " " + mpaName + " " + mpa.toString());
     }
 
     @JsonProperty("genres")
     private void unpackGenres(List<Map<String, String>> genres) {
         if (genres.size() > 0) {
             this.genres = new ArrayList<>();
-            for(Map<String, String> genreRow : genres) {
+            for (Map<String, String> genreRow : genres) {
                 int genreId = Integer.parseInt(genreRow.get("id"));
                 String genreName = genreRow.get("name");
                 this.genres.add(new Genre(genreId, genreName));
             }
         }
-        log.debug(this.genres.toString());
     }
 }
