@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
-public class FilmDBStorage implements FilmStorage{
+public class FilmDBStorage implements FilmStorage {
     private final String filmSQL = "SELECT f.film_id, f.name, f.description, f.creation_date, f.duration, \n" +
                                    "       m.mpa_id, m.name as mpa_name, \n" +
                                    "       (SELECT COUNT(*) FROM film_like WHERE film_id = f.film_id) likes \n" +
