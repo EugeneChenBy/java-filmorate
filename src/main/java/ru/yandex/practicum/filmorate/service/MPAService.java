@@ -18,9 +18,9 @@ public class MPAService {
 
     public List<MPA> getAllMPAs() {
         return mpaDBStorage.getMPAsList();
-    };
+    }
 
     public MPA getMPAById(int id) {
         return mpaDBStorage.getMPAById(id);
-    };
+    }
 }
