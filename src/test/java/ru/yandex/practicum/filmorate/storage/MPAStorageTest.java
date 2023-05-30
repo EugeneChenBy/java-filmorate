@@ -22,7 +22,7 @@ public class MPAStorageTest {
     static List<MPA> etalon;
 
     @BeforeAll
-    static void BeforeAll() {
+    static void beforeAll() {
         etalon = List.of(new MPA(1, "G"),
                 new MPA(2, "PG"),
                 new MPA(3, "PG-13"),

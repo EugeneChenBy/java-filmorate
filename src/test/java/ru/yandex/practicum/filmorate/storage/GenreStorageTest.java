@@ -23,7 +23,7 @@ public class GenreStorageTest {
     static List<Genre> etalon;
 
     @BeforeAll
-    static void BeforeAll() {
+    static void beforeAll() {
         etalon = List.of(new Genre(1, "Комедия"),
                 new Genre(2, "Драма"),
                 new Genre(3, "Мультфильм"),
