@@ -18,12 +18,12 @@ public class GenreDBStorage {
     }
 
     public List<Genre> getGenresList() {
-        String sql = "SELECT genre_id, name FROM genre;";
+        String sql = "SELECT genre_id, name FROM genre ORDER BY genre_id";
         return jdbcTemplate.query(sql, new GenreRowMapper());
     }
 
     public Genre getGenreById(int id) {
-        String sql = "SELECT genre_id, name FROM genre WHERE genre_id = ? ;";
+        String sql = "SELECT genre_id, name FROM genre WHERE genre_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {

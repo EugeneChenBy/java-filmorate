@@ -18,12 +18,12 @@ public class MPADBStorage {
     }
 
     public List<MPA> getMPAsList() {
-        String sql = "SELECT mpa_id, name FROM mpa;";
+        String sql = "SELECT mpa_id, name FROM mpa ORDER BY mpa_id";
         return jdbcTemplate.query(sql, new MPARowMapper());
     }
 
     public MPA getMPAById(int id) {
-        String sql = "SELECT mpa_id, name FROM mpa WHERE mpa_id = ? ;";
+        String sql = "SELECT mpa_id, name FROM mpa WHERE mpa_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, new MPARowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
