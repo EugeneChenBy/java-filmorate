@@ -35,7 +35,7 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public List<User> getUsersList() {
-        String sql = userSQL + ";";
+        String sql = userSQL + " ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper());
     }
 
@@ -90,14 +90,14 @@ public class UserDBStorage implements UserStorage {
 
     @Override
     public  List<User> getFriends(int id) {
-        String sql = friendsSQL + ";";
+        String sql = friendsSQL + " ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper(), id, id);
     }
 
     @Override
     public List<User> getCommonFriends(int userId, int otherUserId) {
-        String sql = friendsSQL + "\nINTERSECT\n" + friendsSQL + "\nMINUS\n"
-                     + userSQL + " WHERE user_id = ?" + "\nMINUS\n" + userSQL + " WHERE user_id = ?";
+        String sql = "(" + friendsSQL + ")" + "\nINTERSECT\n" + "(" + friendsSQL + ")" + "\nMINUS\n"
+                     + userSQL + " WHERE user_id = ?" + "\nMINUS\n" + userSQL + " WHERE user_id = ? ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper(), userId, userId, otherUserId, otherUserId, userId, otherUserId);
     }
 
