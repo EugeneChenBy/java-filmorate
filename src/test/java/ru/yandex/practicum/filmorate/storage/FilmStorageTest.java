@@ -81,6 +81,7 @@ public class FilmStorageTest {
                 .birthday(LocalDate.of(2000, 01, 01))
                 .build();
     }
+
     private void renewData() {
         jdbcTemplate.update("DELETE FROM film_like");
         jdbcTemplate.update("DELETE FROM film_genre");
@@ -141,7 +142,7 @@ public class FilmStorageTest {
     }
 
     @Test
-    void shouildGetFilmsList(){
+    void shouildGetFilmsList() {
         films = List.of(film1, film2, film3, film4, film5);
 
         service.create(film1);
