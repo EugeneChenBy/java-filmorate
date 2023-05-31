@@ -36,7 +36,7 @@ public class FilmController {
     public Film findById(@PathVariable("id") int filmId) {
         log.info("Получен GET-запрос на получение фильма - {}", filmId);
 
-        return filmService.getFilmById(filmId);
+        return filmService.getFilmByIdElseThrow(filmId);
     }
 
     @PutMapping("/films/{id}/like/{userId}")

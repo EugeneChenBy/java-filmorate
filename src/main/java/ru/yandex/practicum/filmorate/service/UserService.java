@@ -20,7 +20,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public User getUserElseThrow(int id) {
+    public User getUserByIdElseThrow(int id) {
         try {
             return userStorage.getUserById(id);
         } catch (EmptyResultDataAccessException e) {
@@ -38,7 +38,7 @@ public class UserService {
     public User update(User user) {
         validate(user);
 
-        User userTmp = getUserElseThrow(user.getId());
+        User userTmp = getUserByIdElseThrow(user.getId());
 
         return userStorage.update(user);
     }
@@ -47,13 +47,9 @@ public class UserService {
         return userStorage.getUsersList();
     }
 
-    public User getUserById(int id) {
-        return getUserElseThrow(id);
-    }
-
     public void addFriend(int userId, int friendId) {
-        User user = getUserElseThrow(userId);
-        User friend = getUserElseThrow(friendId);
+        User user = getUserByIdElseThrow(userId);
+        User friend = getUserByIdElseThrow(friendId);
 
         addFriend(user, friend);
     }
@@ -63,8 +59,8 @@ public class UserService {
     }
 
     public void removeFriend(int userId, int friendId) {
-        User user = getUserElseThrow(userId);
-        User friend = getUserElseThrow(friendId);
+        User user = getUserByIdElseThrow(userId);
+        User friend = getUserByIdElseThrow(friendId);
 
         removeFriend(user, friend);
     }
@@ -74,7 +70,7 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
-        User user = getUserElseThrow(userId);
+        User user = getUserByIdElseThrow(userId);
 
         return getFriends(user);
     }
@@ -84,8 +80,8 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int userId, int otherUserId) {
-        User user = getUserElseThrow(userId);
-        User otherUser = getUserElseThrow(otherUserId);
+        User user = getUserByIdElseThrow(userId);
+        User otherUser = getUserByIdElseThrow(otherUserId);
 
         return getCommonFriends(user, otherUser);
     }

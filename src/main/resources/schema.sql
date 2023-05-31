@@ -10,9 +10,6 @@ create table if not exists film
     last_update   timestamp
 );
 
-create unique index if not exists film_id_uindex
-    on film(film_id);
-
 drop table if exists mpa cascade;
 create table if not exists mpa
 (
@@ -20,9 +17,6 @@ create table if not exists mpa
     name          varchar(64) not null,
     last_update   timestamp
 );
-
-create unique index if not exists mpa_id_uindex
-    on mpa(mpa_id);
 
 drop table if exists genre cascade;
 create table if not exists genre
@@ -32,9 +26,6 @@ create table if not exists genre
     last_update   timestamp
 );
 
-create unique index if not exists genre_id_uindex
-    on genre(genre_id);
-
 drop table if exists film_genre;
 create table if not exists film_genre
 (
@@ -42,11 +33,9 @@ create table if not exists film_genre
     genre_id      int,
     last_update   timestamp,
     CONSTRAINT fk_film_id FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE CASCADE,
-    CONSTRAINT fk_genre_id FOREIGN KEY (genre_id) REFERENCES genre (genre_id)
+    CONSTRAINT fk_genre_id FOREIGN KEY (genre_id) REFERENCES genre (genre_id),
+    PRIMARY KEY (film_id, genre_id)
 );
-
-create unique index if not exists filmgenre_id_uindex
-    on film_genre(film_id, genre_id);
 
 drop table if exists users cascade;
 create table if not exists users
@@ -58,9 +47,6 @@ create table if not exists users
     birthday      date,
     last_update   timestamp
 );
-
-create unique index if not exists user_id_uindex
-    on users(user_id);
 
 drop table if exists friend cascade ;
 create table if not exists friend
@@ -74,9 +60,6 @@ create table if not exists friend
     PRIMARY KEY (user1_id, user2_id)
 );
 
-create unique index if not exists friends_uindex
-    on friend(user1_id, user2_id);
-
 drop table if exists film_like cascade ;
 create table if not exists film_like
 (
@@ -87,6 +70,3 @@ create table if not exists film_like
     CONSTRAINT fk_likeuser_id FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
     PRIMARY KEY (film_id, user_id)
 );
-
-create unique index if not exists filmlike_uindex
-    on FILM_LIKE(user_id, film_id);

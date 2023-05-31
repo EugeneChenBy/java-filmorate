@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -24,10 +23,10 @@ public class FilmService {
         this.userService = userService;
     }
 
-    public Film getFilmElseThrow(int id) {
+    public Film getFilmByIdElseThrow(int id) {
         try {
             return filmStorage.getFilmById(id);
-        } catch (EmptyResultDataAccessException e) {
+        } catch (IndexOutOfBoundsException e) {
             String text = "Не найден фильм с id = " + id;
             throw new FilmNotFoundException(text);
         }
@@ -44,7 +43,7 @@ public class FilmService {
     public Film update(Film film) {
         validate(film);
 
-        Film filmTmp = getFilmElseThrow(film.getId());
+        Film filmTmp = getFilmByIdElseThrow(film.getId());
 
         return filmStorage.update(film);
     }
@@ -53,15 +52,9 @@ public class FilmService {
         return filmStorage.getFilmsList();
     }
 
-    public Film getFilmById(int id) {
-       // return new Film(1, "name", "description", LocalDate.of(1988, 11, 14),
-       //         Duration.ofMinutes(100), new MPADto(1));
-        return getFilmElseThrow(id);
-    }
-
     public void likeFilm(int filmId, int userId) {
-        Film film = getFilmElseThrow(filmId);
-        User user = userService.getUserElseThrow(userId);
+        Film film = getFilmByIdElseThrow(filmId);
+        User user = userService.getUserByIdElseThrow(userId);
 
         likeFilm(film, user);
     }
@@ -71,8 +64,8 @@ public class FilmService {
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = getFilmElseThrow(filmId);
-        User user = userService.getUserElseThrow(userId);
+        Film film = getFilmByIdElseThrow(filmId);
+        User user = userService.getUserByIdElseThrow(userId);
 
         removeLike(film, user);
     }

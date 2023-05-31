@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserStorageTest {
     @Autowired
-    UserDBStorage storage;
+    UserStorage storage;
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -33,7 +33,7 @@ public class UserStorageTest {
     User user4;
     User user5;
 
-    private void newDBData() {
+    private void renewData() {
         jdbcTemplate.update("DELETE FROM users");
         jdbcTemplate.update("DELETE FROM friend");
 
@@ -73,7 +73,7 @@ public class UserStorageTest {
 
     @BeforeEach
     void beforeEach() {
-        newDBData();
+        renewData();
     }
 
     @Test
@@ -123,7 +123,7 @@ public class UserStorageTest {
     void shouldGetUserById() {
         User user1Added = storage.create(user1);
 
-        User user1Check = storage.getUserById(1);
+        User user1Check = storage.getUserById(user1.getId());
         assertEquals(user1, user1Check, "Добавленный пользователь не равен найденному по id");
     }
 
