@@ -1,27 +1,37 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserControllerTest {
+@SpringBootTest
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+class UserValidationTest {
 
-    UserController controller;
+    @Autowired
+    UserService service;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     User user;
 
-    private void newUserController() {
-        controller = new UserController(new UserService(new InMemoryUserStorage()));
+    private void clearDBData() {
+        jdbcTemplate.update("DELETE FROM users");
     }
 
     @BeforeEach
     void beforeEach() {
-        newUserController();
+        clearDBData();
     }
 
     void createNewValidUser() {
@@ -37,10 +47,10 @@ class UserControllerTest {
     void shouldCreateUser() {
         createNewValidUser();
 
-        controller.create(user);
+        User userTmp = service.create(user);
 
-        assertEquals(1, controller.getUsers().size(), "Пользователь не добавлен");
-        assertEquals(user, controller.getUsers().get(0), "Созданный пользователь не равен добавляемому");
+        assertEquals(1, service.getAllUsers().size(), "Пользователь не добавлен");
+        assertEquals(user, service.getAllUsers().get(0), "Созданный пользователь не равен добавляемому");
     }
 
     @Test
@@ -48,37 +58,37 @@ class UserControllerTest {
         createNewValidUser();
         user.setBirthday(LocalDate.now().plusDays(1));
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Дата рождения не может быть в будущем", e.getMessage(), "Ошибка создания пользователя с датой рождения в будущем не отловлена");
         }
 
-        newUserController();
+        clearDBData();
         createNewValidUser();
         user.setBirthday(LocalDate.now());
-        controller.create(user);
-        assertEquals(1, controller.getUsers().size(), "Пользователь с корректной датой рождения по какой-то причине добавился");
+        service.create(user);
+        assertEquals(1, service.getAllUsers().size(), "Пользователь с корректной датой рождения по какой-то причине не добавился");
 
-        newUserController();
+        clearDBData();
         createNewValidUser();
         user.setBirthday(LocalDate.now().minusDays(1));
-        controller.create(user);
-        assertEquals(1, controller.getUsers().size(), "Пользователь с корректной датой рождения по какой-то причине добавился");
+        service.create(user);
+        assertEquals(1, service.getAllUsers().size(), "Пользователь с корректной датой рождения по какой-то причине не добавился");
     }
 
     @Test
     void shouldCreateUserWithEmptyName() {
         createNewValidUser();
         user.setName("");
-        controller.create(user);
-        int index = controller.getUsers().size() - 1;
-        assertEquals("eugene_chen", controller.getUsers().get(index).getName(), "Имя добавленного пользователя не равно логину");
+        service.create(user);
+        int index = service.getAllUsers().size() - 1;
+        assertEquals("eugene_chen", service.getAllUsers().get(index).getName(), "Имя добавленного пользователя не равно логину");
 
         createNewValidUser();
         user.setName(null);
-        controller.create(user);
-        index = controller.getUsers().size() - 1;
-        assertEquals("eugene_chen", controller.getUsers().get(index).getName(), "Имя добавленного пользователя не равно логину");
+        service.create(user);
+        index = service.getAllUsers().size() - 1;
+        assertEquals("eugene_chen", service.getAllUsers().get(index).getName(), "Имя добавленного пользователя не равно логину");
     }
 
     @Test
@@ -86,29 +96,29 @@ class UserControllerTest {
         createNewValidUser();
         user.setLogin("");
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Логин не может быть пустым", e.getMessage(), "Ошибка создания пользователя с пустым логином не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
 
         createNewValidUser();
         user.setLogin(null);
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Логин не может быть пустым", e.getMessage(), "Ошибка создания пользователя с пустым логином не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
 
         createNewValidUser();
         user.setLogin("eugene chen");
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Логин не может содержать пробелы", e.getMessage(), "Ошибка создания пользователя с пробелами в логине не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным логином по какой-то причине добавился");
     }
 
     @Test
@@ -116,28 +126,28 @@ class UserControllerTest {
         createNewValidUser();
         user.setEmail("");
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Email не может быть пустым", e.getMessage(), "Ошибка создания пользователя с пустым email не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
 
         createNewValidUser();
         user.setEmail(null);
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Email не может быть пустым", e.getMessage(), "Ошибка создания пользователя с пустым email не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
 
         createNewValidUser();
         user.setEmail("euegenechen");
         try {
-            controller.create(user);
+            service.create(user);
         } catch (Exception e) {
             assertEquals("Email должен содержать @", e.getMessage(), "Ошибка создания пользователя без @ в Email не отловлена");
         }
-        assertEquals(0, controller.getUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
+        assertEquals(0, service.getAllUsers().size(), "Пользователь с инвалидным Email по какой-то причине добавился");
     }
 }

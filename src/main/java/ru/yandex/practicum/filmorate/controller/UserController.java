@@ -36,7 +36,7 @@ public class UserController {
     public User findById(@PathVariable("id") int userId) {
         log.info("Получен GET-запрос на получение пользователя с id - {}", userId);
 
-        return userService.getUserById(userId);
+        return userService.getUserByIdElseThrow(userId);
     }
 
     @GetMapping("/users/{id}/friends")

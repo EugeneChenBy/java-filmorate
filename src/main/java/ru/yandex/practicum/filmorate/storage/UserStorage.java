@@ -16,5 +16,11 @@ public interface UserStorage {
 
     public User getUserById(int id);
 
-    public User searchUserByEmail(String email);
+    public  List<User> getFriends(int id);
+
+    public List<User> getCommonFriends(int userId, int otherUserId);
+
+    public void addFriend(int user1Id, int user2Id);
+
+    public void removeFriend(int user1Id, int user2Id);
 }
